@@ -11,8 +11,6 @@ SMODS.current_mod.optional_features = {
     post_trigger = true,
 }
 
-SMODS.current_mod.debug_info = "!!!IN TESTING!!! this mod is likely the cause of your crash"
-
 SMODS.Atlas({
 	key = "modicon",
 	path = "icon.png",
