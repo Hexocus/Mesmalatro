@@ -1,0 +1,11 @@
+{
+  "id": "Mesmalatro",
+  "name": "Mesmalatro",
+  "author": ["Hexocus", "imiam_idiot"],
+  "description": "Adds a myriad of content based off the game MESMALIE by Rain (orbitaldot).",
+  "badge_colour": "fb04fb",
+  "badge_text_colour": "ffffff",
+  "prefix": "mesm",
+  "main_file": "Mesmalatro.lua",
+  "version": "1.0.0"
+}
