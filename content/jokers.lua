@@ -448,7 +448,7 @@ SMODS.Joker{
 	
 	discovered = true,
 	
-	artist = "imiam_idiot",
+	artist = "dotii",
 	
 	config = { extra = { max_hand_level = 1, created = false } },
 	
@@ -457,24 +457,37 @@ SMODS.Joker{
 	end,
 	
 	calculate = function(self, card, context)
-		if context.before and G.GAME.hands[context.scoring_name].level <= card.ability.extra.max_hand_level and not card.ability.extra.created then
-			G.E_MANAGER:add_event(Event({
-				func = function()
-					if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
-						G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
-							
-						local new_card = SMODS.create_card( { set = "Tarot" } )
-						new_card:add_to_deck()
-						G.consumeables:emplace(new_card)
-							
-						G.GAME.consumeable_buffer = 0
-						
-						card.ability.extra.created = true
+		if context.before and not card.ability.extra.created then
+			-- for some reason, level is not always an actual number
+			-- and is sometimes a table? thus it gets typechecked here
+			-- (very shittily)
 		
-						return true
-					end
-				end,
-			}))
+			-- assuming a hand's level is 1 this way is eehhhh but who cares
+			-- this totally wont behave strangely
+			local level = 1
+			if type(G.GAME.hands[context.scoring_name].level) == 'number' then
+				level = G.GAME.hands[context.scoring_name].level
+			end
+			
+			if G.GAME.hands[context.scoring_name].level <= card.ability.extra.max_hand_level then
+				G.E_MANAGER:add_event(Event({
+					func = function()
+						if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+							G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+								
+							local new_card = SMODS.create_card( { set = "Tarot" } )
+							new_card:add_to_deck()
+							G.consumeables:emplace(new_card)
+								
+							G.GAME.consumeable_buffer = 0
+							
+							card.ability.extra.created = true
+			
+							return true
+						end
+					end,
+				}))
+			end
 		end
 		
 		if context.end_of_round and context.main_eval then
