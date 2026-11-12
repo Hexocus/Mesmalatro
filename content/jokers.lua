@@ -212,17 +212,31 @@ SMODS.Joker{
 	end,
 	
 	calculate = function(self, card, context)
-		if context.before and not context.blueprint and G.GAME.hands[context.scoring_name].level <= card.ability.extra.max_hand_level then
-			SMODS.scale_card(card, {
-				ref_table = card.ability.extra,
-				ref_value = "chips",
-				scalar_value = "chips_bonus",
-				scaling_message = {
-					message = localize('k_upgrade_ex'),
-					colour = G.C.CHIPS
-				}
-			})
+		if context.before and not context.blueprint then
+			-- for some reason, level is not always an actual number
+			-- and is sometimes a table? thus it gets typechecked here
+			-- (very shittily)
+		
+			-- assuming a hand's level is 1 this way is eehhhh but who cares
+			-- this totally wont behave strangely
+			local level = 1
+			if type(G.GAME.hands[context.scoring_name].level) == 'number' then
+				level = G.GAME.hands[context.scoring_name].level
+			end
+
+			if level <= card.ability.extra.max_hand_level then
+				SMODS.scale_card(card, {
+					ref_table = card.ability.extra,
+					ref_value = "chips",
+					scalar_value = "chips_bonus",
+					scaling_message = {
+						message = localize('k_upgrade_ex'),
+						colour = G.C.CHIPS
+					}
+				})
+			end
 		end
+		
 		if context.joker_main then
 			if card.ability.extra.chips ~= 0 then
 				return {
@@ -469,7 +483,7 @@ SMODS.Joker{
 				level = G.GAME.hands[context.scoring_name].level
 			end
 			
-			if G.GAME.hands[context.scoring_name].level <= card.ability.extra.max_hand_level then
+			if level <= card.ability.extra.max_hand_level then
 				G.E_MANAGER:add_event(Event({
 					func = function()
 						if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
